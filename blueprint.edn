@@ -1,0 +1,42 @@
+{:itonami.blueprint/id "cloud-itonami-isic-3212"
+ :itonami.blueprint/name "Manufacture of imitation jewellery and related articles"
+ :itonami.blueprint/isic-rev5 "3212"
+ :itonami.blueprint/domain :imitation-jewellery/manufacturing
+ :itonami.blueprint/license "AGPL-3.0-or-later"
+ :itonami.blueprint/social-impact [:worker-safety :materials-safety :consumer-protection]
+ :itonami.blueprint/governor :imitation-jewellery-workshop-plant-operations-governor
+ :itonami.blueprint/robotics true
+ :itonami.blueprint/required-technologies [:robotics :identity :forms :dmn :bpmn :audit-ledger :cae]
+ :itonami.blueprint/optional-technologies []
+ :itonami.blueprint/status :public-oss
+ :itonami.blueprint/maturity :implemented
+ :itonami.blueprint/implemented-slice
+ "ImitationJewelryAdvisor ⊣ Imitation Jewellery Workshop Plant
+ Operations Governor, langgraph-clj StateGraph, append-only audit
+ ledger. An imitation-jewellery-workshop PLANT OPERATIONS COORDINATION
+ actor for base-metal casting/plating/finishing lines producing
+ finished costume/fashion jewellery and related articles (rings/
+ chains/pendants/bracelets/earrings in zinc-alloy/brass/copper/
+ nickel-silver/stainless-steel, gold-, silver- or rhodium-plated) --
+ not direct casting/plating-line-equipment control authority and not a
+ materials-safety/lead-content-compliance certification authority.
+ Four ops (`:log-production-batch` / `:schedule-maintenance` /
+ `:flag-safety-concern` / `:coordinate-shipment`), all `:effect
+ :propose` only. Thirteen concrete governor checks elaborate this
+ blueprint's four HARD invariants: propose-only effect, closed op
+ allowlist, closed proposal-effect allowlist (no direct casting/
+ plating-line-equipment control), permanent equipment-actuate block,
+ permanent lead/cadmium-content compliance-certification-authority
+ block (this actor never self-issues a materials-safety/lead-content
+ compliance certification), independent workshop-equipment
+ verification/registration before maintenance scheduling, independent
+ batch verification/registration before shipment coordination,
+ independent shipment-quantity recompute against the batch's own
+ logged production quantity, double-schedule guard, base-metal-type
+ validation, plating-thickness plausibility validation, batch-weight
+ plausibility validation, and defect-rate plausibility validation.
+ Safety-concern flagging (materials-safety lead/cadmium-content-
+ compliance hazard, plating-chemical hazard, theft/security concern)
+ ALWAYS escalates to a human workshop supervisor; `:log-production-
+ batch` is the only op eligible to auto-commit, and only at phase 3
+ when governor-clean."}
