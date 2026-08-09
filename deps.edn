@@ -11,7 +11,15 @@
  :deps {io.github.kotoba-lang/langgraph
         {:local/root "../../kotoba-lang/langgraph"}
         io.github.kotoba-lang/langchain
-        {:local/root "../../kotoba-lang/langchain"}}
+        {:local/root "../../kotoba-lang/langchain"}
+        ;; the workspace BASE design system (デジタル庁デザインシステム).
+        ;; `jp-go-dds.skin/dds+skin` restyles the plain semantic markup the
+        ;; operator console emits, so the console owns no token vocabulary
+        ;; of its own. Pinned by git coordinate (NOT :local/root) so a
+        ;; standalone fork of this repo resolves it too.
+        io.github.kotoba-lang/jp-go-digital-design-system
+        {:git/url "https://github.com/kotoba-lang/jp-go-digital-design-system"
+         :git/sha "83db99546eabc53613ae826ea41d1533a3c574af"}}
  :aliases
  {;; offline workspace dev -- pin transitive langchain to local checkout
   ;; (kept for parity with sibling actors' deps.edn shape; redundant
@@ -21,6 +29,10 @@
          {:local/root "../../kotoba-lang/langchain"}}}
   ;; clojure -M:dev:run  -> drive the demo through one OperationActor
   :run {:main-opts ["-m" "imitjewellerymfg.sim"]}
+  ;; clojure -M:dev:render-html [out-file] -> regenerate
+  ;; docs/samples/operator-console.html by executing the REAL actor
+  ;; (advisor -> governor -> phase gate -> store) at build time.
+  :render-html {:main-opts ["-m" "imitjewellerymfg.render-html"]}
   :test {:extra-paths ["test"]
          :extra-deps {io.github.cognitect-labs/test-runner
                       {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
