@@ -1,0 +1,41 @@
+;; What this vertical's robot physically does, declared for
+;; kotoba.robotics.process (kotoba-lang/robotics). `kbb -M:dev:physics` runs it.
+;;
+;; README: an ISIC 3212 imitation-jewellery workshop casts zinc-alloy, brass,
+;; copper, nickel-silver and stainless pieces, plates them (gold, silver,
+;; rhodium flash or standard plating over the base metal) and finishes them.
+;; The physical work on the plating line: a transfer arm moving loaded
+;; plating racks between tanks, the bath's filter-pump circulation loop, and
+;; draining a rinse tank for its change-out.
+;;
+;; Every number without a cited source is marked `estimate` in its :basis.
+;; Replacing an estimate with a sourced value is this bot's growth work.
+{:physics/schema "itonami.physical-ai.spec.v1"
+ :repo "cloud-itonami/cloud-itonami-isic-3212"
+ :cases
+ [{:id :rack-transfer-between-tanks
+   :kind :manipulator
+   :procedure "plating-line transfer arm lifts a loaded plating rack out of the nickel strike tank and lowers it into the next rinse tank"
+   :params {:l1-m 0.55 :l2-m 0.50 :m1-kg 7.0 :m2-kg 5.0
+            :from [0.60 0.00] :to [0.20 0.70] :duration-s 2.0 :steps 400}
+   :sweep {:param :payload-kg :values [2.0 4.0 7.0 10.0 15.0]}
+   :quantity :peak-tau1-nm
+   :limit {:max 120.0 :basis "estimate: continuous shoulder torque of a ~12 kg-payload collaborative arm class"}
+   :boundary {:lo 0.5 :hi 50.0}}
+  {:id :plating-bath-filter-loop
+   :kind :pipe-flow
+   :procedure "filter pump circulates the plating bath through a cartridge filter and back to the tank (DN20 PVC, 12 m equivalent length, 1.0 m lift)"
+   :params {:diameter-m 0.020 :length-m 12.0 :roughness-m 1.5e-6
+            :density-kg-m3 1200.0 :viscosity-pa-s 1.5e-3 :pump-efficiency 0.40 :elevation-m 1.0}
+   :sweep {:param :q-m3s :values [0.0002 0.0004 0.0006 0.0008 0.0012]}
+   :quantity :pressure-drop-pa
+   :limit {:max 120000.0 :basis "estimate: ~10 m head of a small magnet-drive filter pump, before the cartridge's own pressure drop"}
+   :boundary {:lo 0.0001 :hi 0.003}}
+  {:id :rinse-tank-change-out
+   :kind :tank-drain
+   :procedure "counter-flow rinse tank (0.8 m x 0.6 m, 0.7 m deep) drains to the effluent treatment line through its bottom valve for the weekly change-out"
+   :params {:tank-area-m2 0.48 :h0-m 0.7 :h-target-m 0.02 :cd 0.62 :dt-s 0.1 :max-time-s 7200.0}
+   :sweep {:param :orifice-area-m2 :values [0.0002 0.0003 0.0005 0.0008 0.0013]}
+   :quantity :time-to-target-s
+   :limit {:max 600.0 :basis "estimate: the change-out must fit in a 10-minute line stop"}
+   :boundary {:lo 0.0001 :hi 0.003}}]}
